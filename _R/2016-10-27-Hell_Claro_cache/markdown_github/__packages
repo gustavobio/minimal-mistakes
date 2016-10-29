@@ -1,0 +1,9 @@
+base
+httr
+xml2
+rvest
+dplyr
+ggplot2
+readr
+tidyr
+broom
