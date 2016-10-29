@@ -245,7 +245,7 @@ tidy(mod)
 lista_municipios <- split(municipios, municipios$municipio)
 
 # Regressões
-res_municipios <- do.call("rbind", lapply(lista_municipios, function(x) glance(lm(roubo ~ ano, x))))
+res_municipios <- do.call("rbind", lapply(lista_municipios, function(x) tidy(lm(roubo/pop*100000 ~ ano, x))[2, ]))
 res_municipios$municipio <- rownames(res_municipios)
 res_municipios <- merge(res_municipios, pop_sp)
 ```
@@ -254,12 +254,12 @@ As tendências:
 
 ```{r, dpi = 600}
 res_municipios %>% 
-  filter(pop > 100000 & p.value < 0.05 & statistic > 0) %>%
+  filter(pop > 100000 & p.value < 0.05 & estimate > 0) %>%
   mutate(bin = ifelse(municipio %in% c("São Carlos", "Rio Claro", "Ribeirão Preto"), 1, 0)) %>%
-  arrange(desc(statistic)) %>%
+  arrange(desc(estimate)) %>%
   filter(row_number() %in% 1:30 | municipio %in% c("São Carlos", "Rio Claro", "Ribeirão Preto")) %>%
-  mutate(municipio = reorder(municipio, statistic)) %>%
-  ggplot(aes(x = municipio, y = statistic, fill = factor(bin))) +
+  mutate(municipio = reorder(municipio, estimate)) %>%
+  ggplot(aes(x = municipio, y = estimate, fill = factor(bin))) +
   geom_bar(stat = "identity") +
   scale_fill_manual(values = c("1" = "darkgreen", "0" = "grey"), guide = FALSE) +
   coord_flip() +

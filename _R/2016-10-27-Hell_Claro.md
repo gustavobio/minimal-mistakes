@@ -1,13 +1,3 @@
----
-title: "Hell Claro?"
-author: "Gustavo H Carvalho"
-date: "27/10/2016"
-category: r
-tags: [r, statistics]
-comments: true
-type: posts
----
-
 Rio Claro (SP) tem fama de ser mais violenta que outras cidades da região. Será mesmo? Nessa postagem vou dar uma olhada rápida nos dados da SSP SP. De qualquer forma, em 7 meses morando aqui, já tentaram levar minha bicicleta, explodiram o banco da Unesp, furtaram as panelas do restaurante universitário e por aí vai. A questão é: Rio Claro é mais violenta que outras cidades paulistas do mesmo tamanho?
 
 Para responder a essa pergunta, vou usar os dados de criminalidade da [SSP SP](http://www.ssp.sp.gov.br/novaestatistica/Pesquisa.aspx). Pra variar, não há nenhum serviço facilite a compilação desses dados para todas as cidades. O jeito vai ser arrancar tudo da página deles pelo R. Pacotes:
@@ -181,7 +171,7 @@ municipios %>%
   ggtitle("Furtos por 100 mil habitantes em 2015")
 ```
 
-![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](/fig/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
 O negócio está feio na praia. E quanto aos roubos?
 
@@ -201,7 +191,7 @@ municipios %>%
   ggtitle("Roubos por 100 mil habitantes em 2015")
 ```
 
-![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](/fig/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
 Homicídios?
 
@@ -221,7 +211,7 @@ municipios %>%
   ggtitle("Homicídios por 100 mil habitantes em 2015")
 ```
 
-![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](/fig/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
 Qual a tendência dos crimes em relação à outras cidades de tamanho parecido? Aqui precisei massagear um pouco os dados pra criar uma coluna só com os tipos de crimes e outra com o número de ocorrências:
 
@@ -243,7 +233,7 @@ municipios %>%
   xlab("Ano")
 ```
 
-![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](/fig/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
 Parece que Rio Claro e São Carlos são parecidas entre si e com os outros municípios. Quero saber se o número de roubos em Rio Claro é maior que em São Carlos. Vou assumir que as duas regressões tem a mesma inclinação e rodar a ANCOVA sem a interação:
 
@@ -264,7 +254,7 @@ tidy(mod)
 lista_municipios <- split(municipios, municipios$municipio)
 
 # Regressões
-res_municipios <- do.call("rbind", lapply(lista_municipios, function(x) glance(lm(roubo ~ ano, x))))
+res_municipios <- do.call("rbind", lapply(lista_municipios, function(x) tidy(lm(roubo/pop*100000 ~ ano, x))[2, ]))
 res_municipios$municipio <- rownames(res_municipios)
 res_municipios <- merge(res_municipios, pop_sp)
 ```
@@ -273,12 +263,12 @@ As tendências:
 
 ``` r
 res_municipios %>% 
-  filter(pop > 100000 & p.value < 0.05 & statistic > 0) %>%
+  filter(pop > 100000 & p.value < 0.05 & estimate > 0) %>%
   mutate(bin = ifelse(municipio %in% c("São Carlos", "Rio Claro", "Ribeirão Preto"), 1, 0)) %>%
-  arrange(desc(statistic)) %>%
+  arrange(desc(estimate)) %>%
   filter(row_number() %in% 1:30 | municipio %in% c("São Carlos", "Rio Claro", "Ribeirão Preto")) %>%
-  mutate(municipio = reorder(municipio, statistic)) %>%
-  ggplot(aes(x = municipio, y = statistic, fill = factor(bin))) +
+  mutate(municipio = reorder(municipio, estimate)) %>%
+  ggplot(aes(x = municipio, y = estimate, fill = factor(bin))) +
   geom_bar(stat = "identity") +
   scale_fill_manual(values = c("1" = "darkgreen", "0" = "grey"), guide = FALSE) +
   coord_flip() +
@@ -287,7 +277,7 @@ res_municipios %>%
   ggtitle("Cidades com maiores tendências de alta do número de roubos")
 ```
 
-![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![](/fig/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
 Nenhuma cidade apresentou tendência de queda. Quais cidades são parecidas com Rio Claro de maneira geral?
 
@@ -315,7 +305,7 @@ par(mar=c(4,4,3,10))
 plot(as.dendrogram(clust), horiz = TRUE, main = "Municípios com número de habitantes entre 100 e 300 mil")
 ```
 
-![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-16-1.png)
+![](/fig/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
 Uma ordenação:
 
@@ -323,9 +313,9 @@ Uma ordenação:
 mun_nmds <- dist_mun %>%
   select(-municipio) %>%
   metaMDS(distance = "euclidean")
-  plot(mun_nmds, type = "t", cex = 0.5)
+plot(mun_nmds, type = "t", cex = 0.5)
 ```
 
-![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-17-1.png)
+![](/fig/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
 Barretos parece ter muito mais furtos que os outros municípios de porte parecido. São Caetano do Sul, roubos de veículos. Cidades mais próximas são mais parecidas. Rio Claro parece estar na média. Em uma outra postagem vou mapear os registros de ocorrências em Rio Claro pelos endereços nos BOs.
