@@ -161,7 +161,7 @@ glimpse(municipios)
     ## $ furto_roubo_veiculos <int> 2, 0, 4, 3, 6, 14, 8, 5, 2, 5, 10, 12, 7,...
     ## $ pop                  <dbl> 35048, 35048, 35048, 35048, 35048, 35048,...
 
-Agora já dá pra começar a explorar os dados. Primeiro eu quero saber se Rio Claro, São Carlos e Ribeirão Preto (as cidades que eu costumo frequentar) apresentaram foram parecidos com os municípios mais violentos em 2015. Começando com o número de furtos por 100 mil habitantes:
+Agora já dá pra começar a explorar os dados. Primeiro eu quero saber se Rio Claro, São Carlos e Ribeirão Preto (as cidades que eu costumo frequentar) apresentaram números parecidos com os dos municípios mais violentos em 2015. Começando com o número de furtos por 100 mil habitantes:
 
 ``` r
 municipios %>%
