@@ -17,7 +17,7 @@ fig_width: 14
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Rio Claro (SP), onde passo boa parte dos meus dias hoje, tem fama de ser uma cidade violenta perto de outras do mesmo tamanho aqui no interior. Em 7 meses morando aqui, já tentaram levar minha bicicleta, explodiram o banco da Unesp, furtaram as panelas do restaurante universitário e por aí vai. A questão é: Rio Claro é mais violenta que outras cidades paulistas do mesmo tamanho? Senta que lá vem história.
+Rio Claro (SP) tem fama de ser mais violenta que outras cidades da região. Será mesmo? Nessa postagem vou dar uma olhada rápida nos dados da SSP SP. De qualquer forma, em 7 meses morando aqui, já tentaram levar minha bicicleta, explodiram o banco da Unesp, furtaram as panelas do restaurante universitário e por aí vai. A questão é: Rio Claro é mais violenta que outras cidades paulistas do mesmo tamanho?
 
 Para responder a essa pergunta, vou usar os dados de criminalidade da [SSP SP](http://www.ssp.sp.gov.br/novaestatistica/Pesquisa.aspx). Pra variar, não há nenhum serviço facilite a compilação desses dados para todas as cidades. O jeito vai ser arrancar tudo da página deles pelo R. Pacotes:
 
@@ -29,6 +29,7 @@ library(ggplot2)
 library(readr)
 library(tidyr)
 library(broom)
+library(vegan)
 ```
 
 Algumas funções para criar as requisições e baixar os dados já em um formato mais amigável:
@@ -154,9 +155,7 @@ municipios <- merge(municipios, pop_sp[, c("municipio", "pop")])
 glimpse(municipios)
 ```
 
-Agora já dá pra começar a explorar os dados. Primeiro eu quero saber se Rio Claro,
-São Carlos e Ribeirão Preto apresentaram foram parecidos com os municípios mais 
-violentos em 2015. Começando com o número de furtos por 100 mil habitantes:
+Agora já dá pra começar a explorar os dados. Primeiro eu quero saber se Rio Claro, São Carlos e Ribeirão Preto (as cidades que eu costumo frequentar) apresentaram números parecidos com os dos municípios mais violentos em 2015. Começando com o número de furtos por 100 mil habitantes:
 
 ```{r, dpi = 600}
 municipios %>%
@@ -232,7 +231,7 @@ municipios %>%
   xlab("Ano")
 ```
 
-Parece que Rio Claro e São Carlos são parecidas. Quero saber se o número de roubos em Rio Claro é maior que em São Carlos. Vou assumir que as duas regressões tem a mesma inclinação e tirar a interação da ANCOVA:
+Parece que Rio Claro e São Carlos são parecidas entre si e com os outros municípios. Quero saber se o número de roubos em Rio Claro é maior que em São Carlos. Vou assumir que as duas regressões tem a mesma inclinação e rodar a ANCOVA sem a interação:
 
 ```{r}
 mod <- lm(roubo ~ ano + cat_mun, filter(municipios, municipio %in% c("São Carlos", "Rio Claro")))
@@ -287,12 +286,21 @@ dist_mun <- municipios %>%
 
 ```{r, dpi = 600, fig.height = 14, warning = FALSE}
 rownames(dist_mun) <- dist_mun$municipio
-dist_mun <- dist_mun %>%
+clust <- dist_mun %>%
   select(-municipio) %>%
-  dist()
-clust <- hclust(dist_mun)
+  dist() %>%
+  hclust()
 par(mar=c(4,4,3,10)) 
 plot(as.dendrogram(clust), horiz = TRUE, main = "Municípios com número de habitantes entre 100 e 300 mil")
 ```
 
-Barretos parece ser muito pior que os outros. Cidades mais próximas são mais parecidas. Rio Claro parece estar na média pra municípios do mesmo porte. O número de roubos está aumentando em todos os lugares. Em uma outra postagem vou mapear os registros de ocorrências em Rio Claro pelos endereços nos BOs. 
+Uma ordenação:
+
+```{r, dpi = 600}
+mun_nmds <- dist_mun %>%
+  select(-municipio) %>%
+  metaMDS(distance = "euclidean")
+plot(mun_nmds, type = "t", cex = 0.5)
+```
+
+Barretos parece ter muito mais furtos que os outros municípios de porte parecido. São Caetano do Sul, roubos de veículos. Cidades mais próximas são mais parecidas. Rio Claro parece estar na média. Em uma outra postagem vou mapear os registros de ocorrências em Rio Claro pelos endereços nos BOs.

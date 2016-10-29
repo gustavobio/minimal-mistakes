@@ -1,4 +1,14 @@
-Rio Claro (SP), onde passo boa parte dos meus dias hoje, tem fama de ser uma cidade violenta perto de outras do mesmo tamanho aqui no interior. Em 7 meses morando aqui, já tentaram levar minha bicicleta, explodiram o banco da Unesp, furtaram as panelas do restaurante universitário e por aí vai. A questão é: Rio Claro é mais violenta que outras cidades paulistas do mesmo tamanho? Senta que lá vem história.
+---
+title: "Hell Claro?"
+author: "Gustavo H Carvalho"
+date: "27/10/2016"
+category: r
+tags: [r, statistics]
+comments: true
+type: posts
+---
+
+Rio Claro (SP) tem fama de ser mais violenta que outras cidades da região. Será mesmo? Nessa postagem vou dar uma olhada rápida nos dados da SSP SP. De qualquer forma, em 7 meses morando aqui, já tentaram levar minha bicicleta, explodiram o banco da Unesp, furtaram as panelas do restaurante universitário e por aí vai. A questão é: Rio Claro é mais violenta que outras cidades paulistas do mesmo tamanho?
 
 Para responder a essa pergunta, vou usar os dados de criminalidade da [SSP SP](http://www.ssp.sp.gov.br/novaestatistica/Pesquisa.aspx). Pra variar, não há nenhum serviço facilite a compilação desses dados para todas as cidades. O jeito vai ser arrancar tudo da página deles pelo R. Pacotes:
 
@@ -10,6 +20,7 @@ library(ggplot2)
 library(readr)
 library(tidyr)
 library(broom)
+library(vegan)
 ```
 
 Algumas funções para criar as requisições e baixar os dados já em um formato mais amigável:
@@ -152,7 +163,7 @@ glimpse(municipios)
     ## $ furto_roubo_veiculos <int> 2, 0, 4, 3, 6, 14, 8, 5, 2, 5, 10, 12, 7,...
     ## $ pop                  <dbl> 35048, 35048, 35048, 35048, 35048, 35048,...
 
-Agora já dá pra começar a explorar os dados. Primeiro eu quero saber se Rio Claro, São Carlos e Ribeirão Preto apresentaram foram parecidos com os municípios mais violentos em 2015. Começando com o número de furtos por 100 mil habitantes:
+Agora já dá pra começar a explorar os dados. Primeiro eu quero saber se Rio Claro, São Carlos e Ribeirão Preto (as cidades que eu costumo frequentar) apresentaram números parecidos com os dos municípios mais violentos em 2015. Começando com o número de furtos por 100 mil habitantes:
 
 ``` r
 municipios %>%
@@ -170,7 +181,7 @@ municipios %>%
   ggtitle("Furtos por 100 mil habitantes em 2015")
 ```
 
-![](2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
 O negócio está feio na praia. E quanto aos roubos?
 
@@ -190,7 +201,7 @@ municipios %>%
   ggtitle("Roubos por 100 mil habitantes em 2015")
 ```
 
-![](2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
 Homicídios?
 
@@ -210,7 +221,7 @@ municipios %>%
   ggtitle("Homicídios por 100 mil habitantes em 2015")
 ```
 
-![](2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
 Qual a tendência dos crimes em relação à outras cidades de tamanho parecido? Aqui precisei massagear um pouco os dados pra criar uma coluna só com os tipos de crimes e outra com o número de ocorrências:
 
@@ -232,9 +243,9 @@ municipios %>%
   xlab("Ano")
 ```
 
-![](2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
-Parece que Rio Claro e São Carlos são parecidas. Quero saber se o número de roubos em Rio Claro é maior que em São Carlos. Vou assumir que as duas regressões tem a mesma inclinação e tirar a interação da ANCOVA:
+Parece que Rio Claro e São Carlos são parecidas entre si e com os outros municípios. Quero saber se o número de roubos em Rio Claro é maior que em São Carlos. Vou assumir que as duas regressões tem a mesma inclinação e rodar a ANCOVA sem a interação:
 
 ``` r
 mod <- lm(roubo ~ ano + cat_mun, filter(municipios, municipio %in% c("São Carlos", "Rio Claro")))
@@ -276,7 +287,7 @@ res_municipios %>%
   ggtitle("Cidades com maiores tendências de alta do número de roubos")
 ```
 
-![](2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
 Nenhuma cidade apresentou tendência de queda. Quais cidades são parecidas com Rio Claro de maneira geral?
 
@@ -296,14 +307,80 @@ dist_mun <- municipios %>%
 
 ``` r
 rownames(dist_mun) <- dist_mun$municipio
-dist_mun <- dist_mun %>%
+clust <- dist_mun %>%
   select(-municipio) %>%
-  dist()
-clust <- hclust(dist_mun)
+  dist() %>%
+  hclust()
 par(mar=c(4,4,3,10)) 
 plot(as.dendrogram(clust), horiz = TRUE, main = "Municípios com número de habitantes entre 100 e 300 mil")
 ```
 
-![](2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-16-1.png)
+![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
-Barretos parece ser muito pior que os outros. Cidades mais próximas são mais parecidas. Rio Claro parece estar na média pra municípios do mesmo porte. O número de roubos está aumentando em todos os lugares. Em uma outra postagem vou mapear os registros de ocorrências em Rio Claro pelos endereços nos BOs.
+Uma ordenação:
+
+``` r
+mun_nmds <- dist_mun %>%
+  select(-municipio) %>%
+  metaMDS(distance = "euclidean")
+```
+
+    ## Square root transformation
+    ## Wisconsin double standardization
+    ## Run 0 stress 0.03626604 
+    ## Run 1 stress 0.1175606 
+    ## Run 2 stress 0.03626613 
+    ## ... Procrustes: rmse 2.825905e-05  max resid 0.0001781704 
+    ## ... Similar to previous best
+    ## Run 3 stress 0.03626604 
+    ## ... Procrustes: rmse 4.948035e-06  max resid 3.199708e-05 
+    ## ... Similar to previous best
+    ## Run 4 stress 0.1629203 
+    ## Run 5 stress 0.03626605 
+    ## ... Procrustes: rmse 2.184763e-05  max resid 0.0001468853 
+    ## ... Similar to previous best
+    ## Run 6 stress 0.03626611 
+    ## ... Procrustes: rmse 4.698851e-05  max resid 0.0003217904 
+    ## ... Similar to previous best
+    ## Run 7 stress 0.169383 
+    ## Run 8 stress 0.03626614 
+    ## ... Procrustes: rmse 1.471277e-05  max resid 5.796093e-05 
+    ## ... Similar to previous best
+    ## Run 9 stress 0.03626604 
+    ## ... Procrustes: rmse 2.738984e-06  max resid 1.248394e-05 
+    ## ... Similar to previous best
+    ## Run 10 stress 0.1157404 
+    ## Run 11 stress 0.03626604 
+    ## ... Procrustes: rmse 1.730983e-06  max resid 8.136203e-06 
+    ## ... Similar to previous best
+    ## Run 12 stress 0.03626605 
+    ## ... Procrustes: rmse 8.636974e-06  max resid 5.901905e-05 
+    ## ... Similar to previous best
+    ## Run 13 stress 0.03626604 
+    ## ... Procrustes: rmse 9.68486e-06  max resid 6.46182e-05 
+    ## ... Similar to previous best
+    ## Run 14 stress 0.03626604 
+    ## ... Procrustes: rmse 1.052804e-05  max resid 5.341557e-05 
+    ## ... Similar to previous best
+    ## Run 15 stress 0.1175585 
+    ## Run 16 stress 0.03626605 
+    ## ... Procrustes: rmse 8.350568e-06  max resid 5.168862e-05 
+    ## ... Similar to previous best
+    ## Run 17 stress 0.03626604 
+    ## ... New best solution
+    ## ... Procrustes: rmse 6.080444e-06  max resid 4.067093e-05 
+    ## ... Similar to previous best
+    ## Run 18 stress 0.1157404 
+    ## Run 19 stress 0.1175575 
+    ## Run 20 stress 0.03626605 
+    ## ... Procrustes: rmse 1.902474e-05  max resid 0.0001303083 
+    ## ... Similar to previous best
+    ## *** Solution reached
+
+``` r
+plot(mun_nmds, type = "t", cex = 0.5)
+```
+
+![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-17-1.png)
+
+Barretos parece ter muito mais furtos que os outros municípios de porte parecido. São Caetano do Sul, roubos de veículos. Cidades mais próximas são mais parecidas. Rio Claro parece estar na média. Em uma outra postagem vou mapear os registros de ocorrências em Rio Claro pelos endereços nos BOs.
