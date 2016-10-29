@@ -323,62 +323,7 @@ Uma ordenação:
 mun_nmds <- dist_mun %>%
   select(-municipio) %>%
   metaMDS(distance = "euclidean")
-```
-
-    ## Square root transformation
-    ## Wisconsin double standardization
-    ## Run 0 stress 0.03626604 
-    ## Run 1 stress 0.1175606 
-    ## Run 2 stress 0.03626613 
-    ## ... Procrustes: rmse 2.825905e-05  max resid 0.0001781704 
-    ## ... Similar to previous best
-    ## Run 3 stress 0.03626604 
-    ## ... Procrustes: rmse 4.948035e-06  max resid 3.199708e-05 
-    ## ... Similar to previous best
-    ## Run 4 stress 0.1629203 
-    ## Run 5 stress 0.03626605 
-    ## ... Procrustes: rmse 2.184763e-05  max resid 0.0001468853 
-    ## ... Similar to previous best
-    ## Run 6 stress 0.03626611 
-    ## ... Procrustes: rmse 4.698851e-05  max resid 0.0003217904 
-    ## ... Similar to previous best
-    ## Run 7 stress 0.169383 
-    ## Run 8 stress 0.03626614 
-    ## ... Procrustes: rmse 1.471277e-05  max resid 5.796093e-05 
-    ## ... Similar to previous best
-    ## Run 9 stress 0.03626604 
-    ## ... Procrustes: rmse 2.738984e-06  max resid 1.248394e-05 
-    ## ... Similar to previous best
-    ## Run 10 stress 0.1157404 
-    ## Run 11 stress 0.03626604 
-    ## ... Procrustes: rmse 1.730983e-06  max resid 8.136203e-06 
-    ## ... Similar to previous best
-    ## Run 12 stress 0.03626605 
-    ## ... Procrustes: rmse 8.636974e-06  max resid 5.901905e-05 
-    ## ... Similar to previous best
-    ## Run 13 stress 0.03626604 
-    ## ... Procrustes: rmse 9.68486e-06  max resid 6.46182e-05 
-    ## ... Similar to previous best
-    ## Run 14 stress 0.03626604 
-    ## ... Procrustes: rmse 1.052804e-05  max resid 5.341557e-05 
-    ## ... Similar to previous best
-    ## Run 15 stress 0.1175585 
-    ## Run 16 stress 0.03626605 
-    ## ... Procrustes: rmse 8.350568e-06  max resid 5.168862e-05 
-    ## ... Similar to previous best
-    ## Run 17 stress 0.03626604 
-    ## ... New best solution
-    ## ... Procrustes: rmse 6.080444e-06  max resid 4.067093e-05 
-    ## ... Similar to previous best
-    ## Run 18 stress 0.1157404 
-    ## Run 19 stress 0.1175575 
-    ## Run 20 stress 0.03626605 
-    ## ... Procrustes: rmse 1.902474e-05  max resid 0.0001303083 
-    ## ... Similar to previous best
-    ## *** Solution reached
-
-``` r
-plot(mun_nmds, type = "t", cex = 0.5)
+  plot(mun_nmds, type = "t", cex = 0.5)
 ```
 
 ![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-17-1.png)
