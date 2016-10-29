@@ -1,3 +1,12 @@
+---
+title: "Hell Claro?"
+author: "Gustavo H Carvalho"
+date: "27/10/2016"
+category: r
+tags: [r, statistics]
+comments: true
+type: posts
+---
 Rio Claro (SP) tem fama de ser mais violenta que outras cidades da região. Será mesmo? Nessa postagem vou dar uma olhada rápida nos dados da SSP SP. De qualquer forma, em 7 meses morando aqui, já tentaram levar minha bicicleta, explodiram o banco da Unesp, furtaram as panelas do restaurante universitário e por aí vai. A questão é: Rio Claro é mais violenta que outras cidades paulistas do mesmo tamanho?
 
 Para responder a essa pergunta, vou usar os dados de criminalidade da [SSP SP](http://www.ssp.sp.gov.br/novaestatistica/Pesquisa.aspx). Pra variar, não há nenhum serviço facilite a compilação desses dados para todas as cidades. O jeito vai ser arrancar tudo da página deles pelo R. Pacotes:
