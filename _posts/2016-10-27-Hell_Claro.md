@@ -315,4 +315,4 @@ plot(as.dendrogram(clust), horiz = TRUE, main = "Municípios com número de habi
 
 ![](/figs/2016-10-27-Hell_Claro_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
-Barretos parece ser muito pior que os outros. Cidades mais próximas são mais parecidas. Rio Claro parece estar na média pra municípios do mesmo porte. O número de roubos está aumentando em todos os lugares. Em uma outra postagem vou mapear os registros de ocorrências em Rio Claro pelos endereços nos BOs.
+Barretos parece ser muito pior que os outros. Cidades mais próximas são mais parecidas quanto a criminalidade e Rio Claro parece estar na média pra municípios do mesmo porte. O número de roubos está aumentando em todos os lugares. No idea why. Em uma outra postagem vou mapear os registros de ocorrências em Rio Claro pelos endereços nos BOs.
